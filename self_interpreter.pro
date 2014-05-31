@@ -3,5 +3,13 @@ CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
 
-SOURCES += main.c
+SOURCES += main.c \
+    statemachine.c \
+    bignum.c \
+    errors.c
+
+HEADERS += \
+    statemachine.h \
+    bignum.h \
+    errors.h
 
