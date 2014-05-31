@@ -17,6 +17,8 @@ typedef int Reterr;
 
 #define MEMORY_ALLOCATE_ERROR (1);
 
+#define DIVISION_BY_ZERO (10);
+
 int check_alloc(void *var);
 
 
