@@ -119,9 +119,12 @@ Reterr _bnSum(const Bignum *a, const Bignum *b, Bignum *n, bool _signSec) {
    * 0 -- sum
    */
   int _err = 0;
+  int bMoreA = 0;
   uint64_t i = 0;
+  int16_t isSub = 0;
   int16_t res = 0;
   int16_t carry = 0;
+  int16_t signFir = a->sign ? -1 : 1;
   int16_t signSec = (_signSec != b->sign) ? -1 : 1;
   Bignum *_b = NULL, *_a = NULL;
   int16_t trans = 0;
@@ -132,27 +135,39 @@ Reterr _bnSum(const Bignum *a, const Bignum *b, Bignum *n, bool _signSec) {
   ERR_CH(bnInit(&_a,0));
   ERR_CH(bnInit(&_b,0));
 
-  _b->sign = !_b->sign;
-  n->sign = (bnCmp(_a, _b) < 0) ? 1 : 0;
-  _b->sign = !_b->sign;
+  if (signFir == signSec) {
+    isSub = 1;
+    _a = (Bignum *) a;
+    _b = (Bignum *) b;
+    n->sign = a->sign; // == b->sign;
+    signFir = 1;
+    signSec = 1;
+  } else {
+    isSub = -1;
+    bMoreA = (-1 == bnCmpAbs(a,b));
+    bnCopy(bMoreA ? b : a, _a);
+    bnCopy(bMoreA ? a : b, _b);
+    if (bMoreA) {
+      res = signFir;
+      signFir = signSec;
+      signSec = res;
+    }
 
+    // After that |_a| >= |_b|, _b<0;
 
-  if (-1 == signSec) {
-    bnCopy((-1 == bnCmpAbs(a,b)) ? a : b, _b);
-    bnCopy((-1 == bnCmpAbs(a,b)) ? b : a, _a);
-    _a->sign = 0;
-    _b->sign = 1;
-    n->sign = 1;
+    // Determine sign of `n`
+    _b->sign = !_b->sign;
+    n->sign = n->sign != (1 == bnCmp(_a,_b));
+    _b->sign = !_b->sign;
   }
-
 
   for (i=0; i<n->len; i++) {
     res = 0;
 
-    trans = ((-1 == signSec) && (_a->num[i] < _b->num[i]));
+    trans = ((signFir != signSec) && (_a->num[i] < _b->num[i]));
 
     res += trans*256 + (int16_t) _a->num[i]
-          + signSec * ((int16_t) _b->num[i])
+          + isSub * ((int16_t) _b->num[i])
           + carry;
 
     n->num[i] = res % 256;
