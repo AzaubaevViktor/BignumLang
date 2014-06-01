@@ -202,12 +202,42 @@ int test_bignum(TestContext *cnt) {
   // bnDiv
   {INIT;
     reset_;
-    bnSetInt(a, 0xFFFF);
-    bnSetInt(b, 0x0001);
+    bnSetInt(a, 0x12);
+    bnSetInt(b, 0x2);
     bnChLen(b,3*BNCHUNK);
-    bnSum(a,b,n);
-    bnPrintHex(a);printf("+");bnPrintHex(b);printf("=");bnPrintHex(n);printf("\n");
+    bnMul(a,b,n);
+    bnPrintHex(a);printf("*");bnPrintHex(b);printf("=");bnPrintHex(n);printf("\n");
 
+    bnSetInt(a, 0xFF);
+    bnSetInt(b, 0xFF);
+    bnChLen(b,3*BNCHUNK);
+    bnMul(a,b,n);
+    bnPrintHex(a);printf("*");bnPrintHex(b);printf("=");bnPrintHex(n);printf("\n");
+
+    bnSetInt(a, -0x1F);
+    bnSetInt(b, 0x11);
+    bnChLen(b,3*BNCHUNK);
+    bnMul(a,b,n);
+    bnPrintHex(a);printf("*");bnPrintHex(b);printf("=");bnPrintHex(n);printf("\n");
+
+    bnSetInt(a, 0x100000);
+    bnSetInt(b, 0x0);
+    bnChLen(b,3*BNCHUNK);
+    bnMul(a,b,n);
+    bnPrintHex(a);printf("*");bnPrintHex(b);printf("=");bnPrintHex(n);printf("\n");
+
+    bnSetInt(a, 0x444);
+    bnChLen(a, 100);
+    bnSetInt(b, 0xF);
+    bnChLen(b,3*BNCHUNK);
+    bnMul(a,b,n);
+    bnPrintHex(a);printf("*");bnPrintHex(b);printf("=");bnPrintHex(n);printf("\n");
+
+    bnSetInt(a, 0xFFFFFF);
+    bnSetInt(b, 0xFFFFFF);
+    bnChLen(b,3*BNCHUNK);
+    bnMul(a,b,n);
+    bnPrintHex(a);printf("*");bnPrintHex(b);printf("=");bnPrintHex(n);printf("\n");
   }
 
   printf("=====================================\n");

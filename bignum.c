@@ -189,12 +189,14 @@ Reterr bnMul(const Bignum *a, const Bignum *b, Bignum *n) {
   ERR_CH(bnSetInt(n, 0));
   ERR_CH(bnChLen(n, (a->len) + (b->len) + 1)); // delete +1
 
-      for (i=0; i < a->len; i++) {
+  n->sign = (a->sign != b->sign);
+
+  for (i=0; i < a->len; i++) {
     carry = 0;
     for (j=0; j < b->len; j++) {
       res = (a->num[i]) * (b->num[j]) + carry + n->num[i+j];
-      n->num[i+j] = res % 255;
-      carry = res / 255;
+      n->num[i+j] = res % 256;
+      carry = res / 256;
     }
     n->num[i+j] = carry;
   }
@@ -231,6 +233,7 @@ Reterr bnDiv(const Bignum *a, const Bignum *b, Bignum *n) {
   ERR_CH(bnInit(&deg, a->len - b->len + 1)); // delete +1
   ERR_CH(bnInit(&res, 0));
   ERR_CH(bnInit(&divide, 0));
+  ERR_CH(bnInit(&_a, 0));
   ERR_CH(bnCopy(a, _a));
 
   ERR_CH(bnSetInt(n, 0));
