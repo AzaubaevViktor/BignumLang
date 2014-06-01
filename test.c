@@ -163,6 +163,7 @@ int test_bignum(TestContext *cnt) {
     bnPrintHex(a);printf("+");bnPrintHex(b);printf("=");bnPrintHex(n);printf("\n");
 
     bnSetInt(a, -0xFFF1);
+    bnChLen(a, 100);
     bnSetInt(b, -0xAAAAA111F);
     bnSum(a,b,n);
     bnPrintHex(a);printf("+");bnPrintHex(b);printf("=");bnPrintHex(n);printf("\n");
@@ -198,7 +199,16 @@ int test_bignum(TestContext *cnt) {
     bnSetFDeg(a, 25);
     printf("Set 25th:"); bnPrintHex(a); printf("\n");
   }
+  // bnDiv
+  {INIT;
+    reset_;
+    bnSetInt(a, 0xFFFF);
+    bnSetInt(b, 0x0001);
+    bnChLen(b,3*BNCHUNK);
+    bnSum(a,b,n);
+    bnPrintHex(a);printf("+");bnPrintHex(b);printf("=");bnPrintHex(n);printf("\n");
 
+  }
 
   printf("=====================================\n");
   return 0;

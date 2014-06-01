@@ -162,10 +162,10 @@ Reterr _bnSum(const Bignum *a, const Bignum *b, Bignum *n, bool _signSec) {
   for (i=0; i<n->len; i++) {
     res = 0;
 
-    trans = ((signFir != signSec) && (_a->num[i] < _b->num[i]));
+    trans = ((signFir != signSec) && (_f(i, _a->len, _a->num[i]) < _f(i, _b->len, _b->num[i])));
 
-    res += trans*256 + (int16_t) _a->num[i]
-          + isSub * ((int16_t) _b->num[i])
+    res += trans*256 + (int16_t) _f(i, a->len, _a->num[i])
+          + isSub * ((int16_t) _f(i, _b->len, _b->num[i]))
           + carry;
 
     n->num[i] = res % 256;
