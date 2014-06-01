@@ -63,9 +63,7 @@ int bnSetInt(Bignum *n, const int64_t _var) {
 Reterr bnSetStr(Bignum *n, const char *str) {
   int _err = 0;
   uint64_t i = 0;
-  if (n->len < ceil(strlen(str), BNCHUNK)) {
-    ERR_CH(bnChLen(n, ceil(strlen(str), BNCHUNK)));
-  }
+  ERR_CH(bnChLen(n, ceil(strlen(str), BNCHUNK)));
 
   n->sign = 1;
 

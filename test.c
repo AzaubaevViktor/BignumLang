@@ -24,8 +24,7 @@ int test_bignum(TestContext *cnt) {
   ERR_CH(bnInit(&c,0));
   ERR_CH(bnInit(&n,0));
 
-
-
+  // bnChLen
   {INIT;
   reset_;
   printf("Change len to 0b with BNCHUNK=`%d`: `%"PRIu64"`\n", BNCHUNK, a->len);
@@ -42,6 +41,7 @@ int test_bignum(TestContext *cnt) {
   printf("Change len to 100000000b with BNCHUNK=`%d`: `%"PRIu64"`\n", BNCHUNK, a->len);
   }
 
+  // bnSetInt
   {INIT;
   reset_;
   ERR_CH(bnSetInt(a,0));
@@ -54,10 +54,20 @@ int test_bignum(TestContext *cnt) {
   printf("Set int `0xFEDCBA0987654321`, num:`"); bnPrintHex(a); printf("`\n");
   }
 
+  // bnSetStr
   {INIT;
     reset_;
+    ERR_CH(bnSetStr(a, "X"));
+    printf("Set str 'X', result:"); bnPrintHex(a); printf("\n");
+
     ERR_CH(bnSetStr(a, "abc1234privet"));
     printf("Set str 'abc1234privet', result:"); bnPrintHex(a); printf("\n");
+
+    ERR_CH(bnSetStr(a, "bI"));
+    printf("Set str 'bI', result:"); bnPrintHex(a); printf("\n");
+
+    ERR_CH(bnSetStr(a, ""));
+    printf("Set str '', result:"); bnPrintHex(a); printf("\n");
   }
 
   {INIT;
