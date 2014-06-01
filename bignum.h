@@ -39,4 +39,7 @@ Reterr bnDiv(const Bignum *a, const Bignum *b, Bignum *n);
 Reterr bnMod(const Bignum *a, const Bignum *b, Bignum *n);
 void bnPrintHex(const Bignum *a);
 
+#define ERR_VAR_CH if (_err) return _err
+#define ERR_CH(func) _err = (func); ERR_VAR_CH
+
 #endif // BIGNUM_H

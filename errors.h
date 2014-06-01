@@ -15,11 +15,20 @@ typedef struct _Error {
 
 typedef int Reterr;
 
-#define MEMORY_ALLOCATE_ERROR (1);
+#define MEMORY_ALLOCATE_ERROR (1)
 
-#define DIVISION_BY_ZERO (10);
+#define DIVISION_BY_ZERO (10)
 
-int check_alloc(void *var);
+#define PARSE_ERR_READ_NUM (20)
+#define PARSE_ERR_EQ (21)
+#define PARSE_ERR_COMMAND (22)
+#define PARSE_ERR_GREAT (23)
+#define PARSE_ERR_ARROW_FIRST (24)
+#define PARSE_ERR_ARROW_SECOND (25)
+#define PARSE_ERR_COPY_LAST_OP_NUM (26)
+#define PARSE_ERR_NOT_SEMICOLON (27)
+
+Reterr check_alloc(void *var);
 
 
 #endif // ERRORS_H

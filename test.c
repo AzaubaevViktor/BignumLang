@@ -1,13 +1,13 @@
 #include "test.h"
 
 #define INIT printf("\n-------------Test #%.3d---------------\n\n", ++testC)
-#define ERR_VAR_CH if (_err) printf("Returned error `%d`\n", _err)
-#define ERR_CH(func) _err = (func); ERR_VAR_CH
+#define _ERR_VAR_CH if (_err) printf("Returned error `%d`\n", _err)
+#define _ERR_CH(func) _err = (func); _ERR_VAR_CH
 
 
 #define reset_ \
   printf("Reset state...");\
-  ERR_CH(bnNul(a));ERR_CH(bnNul(b));ERR_CH(bnNul(c));ERR_CH(bnNul(n));var = 0;\
+  _ERR_CH(bnNul(a));_ERR_CH(bnNul(b));_ERR_CH(bnNul(c));_ERR_CH(bnNul(n));var = 0;\
   printf("!\n");
 
 int test_bignum(TestContext *cnt) {
@@ -19,52 +19,52 @@ int test_bignum(TestContext *cnt) {
   int64_t var = 0;
   int testC = 0;
 
-  ERR_CH(bnInit(&a,0));
-  ERR_CH(bnInit(&b,0));
-  ERR_CH(bnInit(&c,0));
-  ERR_CH(bnInit(&n,0));
+  _ERR_CH(bnInit(&a,0));
+  _ERR_CH(bnInit(&b,0));
+  _ERR_CH(bnInit(&c,0));
+  _ERR_CH(bnInit(&n,0));
 
   // bnChLen
   {INIT;
   reset_;
   printf("Change len to 0b with BNCHUNK=`%d`: `%"PRIu64"`\n", BNCHUNK, a->len);
-  ERR_CH(bnChLen(a,100));
+  _ERR_CH(bnChLen(a,100));
   printf("Change len to 100b with BNCHUNK=`%d`: `%"PRIu64"`\n", BNCHUNK, a->len);
   printf("Set 99th byte is `0xFF`\n");
   a->num[99] = 0xFF;
-  ERR_CH(bnChLen(a,10));
+  _ERR_CH(bnChLen(a,10));
   printf("Change len to 10b with BNCHUNK=`%d`: `%"PRIu64"`\n", BNCHUNK, a->len);
-  ERR_CH(bnChLen(a,100));
+  _ERR_CH(bnChLen(a,100));
   printf("Change len to 100b with BNCHUNK=`%d`: `%"PRIu64"`\n", BNCHUNK, a->len);
   printf("99th byte: `0x%.2X` (must be 0x00) \n", a->num[99]);
-  ERR_CH(bnChLen(a,100000000));
+  _ERR_CH(bnChLen(a,100000000));
   printf("Change len to 100000000b with BNCHUNK=`%d`: `%"PRIu64"`\n", BNCHUNK, a->len);
   }
   // bnSetInt
   {INIT;
   reset_;
-  ERR_CH(bnSetInt(a,0));
+  _ERR_CH(bnSetInt(a,0));
   printf("Set int `0`, num:`"); bnPrintHex(a);printf("`\n");
-  ERR_CH(bnSetInt(a,0x00FF));
+  _ERR_CH(bnSetInt(a,0x00FF));
   printf("Set int `0x00FF`, num:`"); bnPrintHex(a); printf("`\n");
-  ERR_CH(bnSetInt(a,0x1234567890ABCDEF));
+  _ERR_CH(bnSetInt(a,0x1234567890ABCDEF));
   printf("Set int `0x1234567890ABCDEF`, num:`"); bnPrintHex(a); printf("`\n");
-  ERR_CH(bnSetInt(a,0xFEDCBA0987654321));
+  _ERR_CH(bnSetInt(a,0xFEDCBA0987654321));
   printf("Set int `0xFEDCBA0987654321`, num:`"); bnPrintHex(a); printf("`\n");
   }
   // bnSetStr
   {INIT;
     reset_;
-    ERR_CH(bnSetStr(a, "X"));
+    _ERR_CH(bnSetStr(a, "X"));
     printf("Set str 'X', result:"); bnPrintHex(a); printf("\n");
 
-    ERR_CH(bnSetStr(a, "abc1234privet"));
+    _ERR_CH(bnSetStr(a, "abc1234privet"));
     printf("Set str 'abc1234privet', result:"); bnPrintHex(a); printf("\n");
 
-    ERR_CH(bnSetStr(a, "bI"));
+    _ERR_CH(bnSetStr(a, "bI"));
     printf("Set str 'bI', result:"); bnPrintHex(a); printf("\n");
 
-    ERR_CH(bnSetStr(a, ""));
+    _ERR_CH(bnSetStr(a, ""));
     printf("Set str '', result:"); bnPrintHex(a); printf("\n");
   }
   // bnCmp
@@ -405,5 +405,5 @@ int test_bignum(TestContext *cnt) {
 }
 
 #undef INIT
-#undef ERR_VAR_CH
-#undef ERR_CH
+#undef _ERR_VAR_CH
+#undef _ERR_CH
