@@ -75,6 +75,15 @@ Reterr bnSetStr(Bignum *n, const char *str) {
 }
 
 
+uint64_t bnGetLen(const Bignum *a) {
+  uint64_t i = 0;
+  for(i=a->len; i!=0; i--) {
+    if (!a->num[i-1]) return i;
+  }
+  return 0;
+}
+
+
 #define _f(x,_max,val) ((x < _max) ? (val) : 0)
 
 
@@ -84,13 +93,19 @@ int _bnCmp(const Bignum *a, const Bignum *b, bool isSignCheck) {
    * -1: a<b
    */
   uint64_t i = 0, j = 0;
+  int factor = 1;
 
-  if ((isSignCheck) && (a->sign != b->sign)) return ((a->sign) > (b->sign)) ? -1 : 1;
+  if ((0 == bnGetLen(a)) && (0 == bnGetLen(b))) return 0;
+
+  if (isSignCheck) {
+    if (a->sign != b->sign) return ((a->sign) > (b->sign)) ? -1 : 1;
+    factor = (a->sign) ? -1 : 1;
+  }
 
   for(j = max(a->len, b->len); j != 0; j--) {
     i = j - 1;
     if (_f(i, a->len, a->num[i]) != _f(i, b->len, b->num[i]))
-      return (_f(i, a->len, a->num[i]) < _f(i, b->len, b->num[i])) ? -1 : 1;
+      return ((_f(i, a->len, a->num[i]) < _f(i, b->len, b->num[i])) ? -1 : 1) * factor;
   }
 
   return 0;
@@ -155,7 +170,7 @@ Reterr _bnSum(const Bignum *a, const Bignum *b, Bignum *n, bool _signSec) {
 
     // Determine sign of `n`
     _b->sign = !_b->sign;
-    n->sign = n->sign != (1 == bnCmp(_a,_b));
+    n->sign = (-1 == bnCmp(_a,_b));
     _b->sign = !_b->sign;
   }
 
@@ -205,11 +220,11 @@ Reterr bnMul(const Bignum *a, const Bignum *b, Bignum *n) {
 }
 
 
-Reterr bnSetFDeg(Bignum *n, int64_t deg) {
+Reterr bnSet1Deg(Bignum *n, int64_t deg) {
   int _err = 0;
   ERR_CH(bnSetInt(n, 0));
   ERR_CH(bnChLen(n, deg / 2 + 1));
-  n->num[deg / 2] = (deg % 2) ? 0xF0 : 0x0F;
+  n->num[deg / 2] = (deg % 2) ? 0x10 : 0x01;
   return 0;
 }
 
@@ -237,16 +252,26 @@ Reterr bnDiv(const Bignum *a, const Bignum *b, Bignum *n) {
   ERR_CH(bnCopy(a, _a));
 
   ERR_CH(bnSetInt(n, 0));
-  ERR_CH(bnChLen(n, a->len - b->len +1));
+  ERR_CH(bnChLen(n, a->len));
 
-  for (i=(a->len - b->len + 1);i!=0;i--) {
-    // Will be work slow, because every time he change size of `deg`
-    ERR_CH(bnSetFDeg(deg, i-1));
+  for (i=_a->len; i!=0; i--) {
+    // Will be work slow, because every time he change size of `deg` and `divide`
+    ERR_CH(bnSet1Deg(deg, i-1));
+    deg->sign = _a->sign != b->sign;
     ERR_CH(bnMul(b, deg, divide));
-    while (bnCmp(_a, divide)) {
-      ERR_CH(bnDiff(_a, divide, _a));
-      ERR_CH(bnSum(n, deg, n));
+    divide->sign = _a->sign;
+
+    while (-1 != bnCmpAbs(_a, divide)) {
+      ERR_CH(bnDiff(_a, divide, res));
+      ERR_CH(bnCopy(res, _a));
+      ERR_CH(bnSum(n, deg, res));
+      ERR_CH(bnCopy(res, n));
     }
+  }
+
+  if ((0 != bnCmpAbs(_a, nul)) && (a->sign != b->sign)) {
+    ERR_CH(bnSum(n, deg, res));
+    ERR_CH(bnCopy(res, n));
   }
 
   free(nul);
@@ -262,9 +287,14 @@ Reterr bnMod(const Bignum *a, const Bignum *b, Bignum *n) {
   Bignum *div = NULL;
   Bignum *divMulB = NULL;
 
+  ERR_CH(bnInit(&div,0));
+  ERR_CH(bnInit(&divMulB,0));
+
   ERR_CH(bnDiv(a,b,div));
   ERR_CH(bnMul(div, b, divMulB));
   ERR_CH(bnDiff(a, divMulB, n));
+
+  n->sign = 0;
 
   free(div);
   free(divMulB);
@@ -275,6 +305,7 @@ Reterr bnMod(const Bignum *a, const Bignum *b, Bignum *n) {
 void bnPrintHex(const Bignum *a) {
   uint64_t i = 0, firstNul = 0;
   int isWrite = 0;
+  printf("0x");
   (a->sign) ? printf("-") : 0;
   for (i=a->len; i!=0; i--) {
     if (!a->num[i-1] && !isWrite) {

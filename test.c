@@ -74,6 +74,14 @@ int test_bignum(TestContext *cnt) {
     bnSetInt(b, -10);
     bnPrintHex(a); switch (bnCmp(a,b)) {case -1:printf(" < ");break;case 1:printf(" > ");break;default:printf(" = ");break;} bnPrintHex(b); printf("\n");
 
+    bnSetInt(a, 0);
+    bnSetInt(b, -1);
+    bnPrintHex(a); switch (bnCmp(a,b)) {case -1:printf(" < ");break;case 1:printf(" > ");break;default:printf(" = ");break;} bnPrintHex(b); printf("\n");
+
+    bnSetInt(a, -12);
+    bnSetInt(b, -10);
+    bnPrintHex(a); switch (bnCmp(a,b)) {case -1:printf(" < ");break;case 1:printf(" > ");break;default:printf(" = ");break;} bnPrintHex(b); printf("\n");
+
     bnSetInt(a, -75757);
     bnSetInt(b, 98756755);
     bnPrintHex(a); switch (bnCmp(a,b)) {case -1:printf(" < ");break;case 1:printf(" > ");break;default:printf(" = ");break;} bnPrintHex(b); printf("\n");
@@ -99,6 +107,18 @@ int test_bignum(TestContext *cnt) {
   // bnSum
   {INIT;
     reset_;
+    bnSetInt(a, 0x0);
+    bnSetInt(b, 0x1);
+    bnChLen(b,3*BNCHUNK);
+    bnSum(a,b,n);
+    bnPrintHex(a);printf("+");bnPrintHex(b);printf("=");bnPrintHex(n);printf("\n");
+
+    bnSetInt(a, 0x0);
+    bnSetInt(b, -0x1);
+    bnChLen(b,3*BNCHUNK);
+    bnSum(a,b,n);
+    bnPrintHex(a);printf("+");bnPrintHex(b);printf("=");bnPrintHex(n);printf("\n");
+
     bnSetInt(a, 0xFFFF);
     bnSetInt(b, 0x0001);
     bnChLen(b,3*BNCHUNK);
@@ -134,6 +154,12 @@ int test_bignum(TestContext *cnt) {
     bnSetInt(b, -0x1);
     bnSum(a,b,n);
     bnPrintHex(a);printf("+");bnPrintHex(b);printf("=");bnPrintHex(n);printf("\n");
+
+    bnSetInt(a, 0x12);
+    bnSetInt(b, -0x2);
+    bnSum(a,b,n);
+    bnPrintHex(a);printf("+");bnPrintHex(b);printf("=");bnPrintHex(n);printf("\n");
+
 
     printf("-----------------------\n");
 
@@ -178,28 +204,28 @@ int test_bignum(TestContext *cnt) {
     bnSum(a,b,n);
     bnPrintHex(a);printf("+");bnPrintHex(b);printf("=");bnPrintHex(n);printf("\n");
   }
-  // bnSetFDeg
+  // bnSet1Deg
   {INIT;
     reset_;
-    bnSetFDeg(a, 10);
+    bnSet1Deg(a, 10);
     printf("Set 10th:"); bnPrintHex(a); printf("\n");
 
-    bnSetFDeg(a, 0);
+    bnSet1Deg(a, 0);
     printf("Set 0th:"); bnPrintHex(a); printf("\n");
 
-    bnSetFDeg(a, 1);
+    bnSet1Deg(a, 1);
     printf("Set 1th:"); bnPrintHex(a); printf("\n");
 
-    bnSetFDeg(a, 2);
+    bnSet1Deg(a, 2);
     printf("Set 2th:"); bnPrintHex(a); printf("\n");
 
-    bnSetFDeg(a, 99);
+    bnSet1Deg(a, 99);
     printf("Set 99th:"); bnPrintHex(a); printf("\n");
 
-    bnSetFDeg(a, 25);
+    bnSet1Deg(a, 25);
     printf("Set 25th:"); bnPrintHex(a); printf("\n");
   }
-  // bnDiv
+  // bnMul
   {INIT;
     reset_;
     bnSetInt(a, 0x12);
@@ -238,6 +264,140 @@ int test_bignum(TestContext *cnt) {
     bnChLen(b,3*BNCHUNK);
     bnMul(a,b,n);
     bnPrintHex(a);printf("*");bnPrintHex(b);printf("=");bnPrintHex(n);printf("\n");
+  }
+  // bnDiv
+  {INIT;
+    reset_;
+    bnSetInt(a, 0x12);
+    bnSetInt(b, 0x2);
+    bnChLen(b,3*BNCHUNK);
+    bnDiv(a,b,n);
+    bnPrintHex(a);printf("/");bnPrintHex(b);printf("=");bnPrintHex(n);printf("|9");printf("\n");
+
+    bnSetInt(a, -0x12);
+    bnSetInt(b, 0x2);
+    bnChLen(b,3*BNCHUNK);
+    bnDiv(a,b,n);
+    bnPrintHex(a);printf("/");bnPrintHex(b);printf("=");bnPrintHex(n);printf("|-9");printf("\n");
+
+    bnSetInt(a, 0x12);
+    bnSetInt(b, -0x2);
+    bnChLen(b,3*BNCHUNK);
+    bnDiv(a,b,n);
+    bnPrintHex(a);printf("/");bnPrintHex(b);printf("=");bnPrintHex(n);printf("|-9");printf("\n");
+
+    bnSetInt(a, -0x12);
+    bnSetInt(b, -0x2);
+    bnChLen(b,3*BNCHUNK);
+    bnDiv(a,b,n);
+    bnPrintHex(a);printf("/");bnPrintHex(b);printf("=");bnPrintHex(n);printf("|9");printf("\n");
+
+    bnSetInt(a, 0x13);
+    bnSetInt(b, 0x2);
+    bnChLen(b,3*BNCHUNK);
+    bnDiv(a,b,n);
+    bnPrintHex(a);printf("/");bnPrintHex(b);printf("=");bnPrintHex(n);printf("|9");printf("\n");
+
+    bnSetInt(a, -0x13);
+    bnSetInt(b, 0x2);
+    bnChLen(b,3*BNCHUNK);
+    bnDiv(a,b,n);
+    bnPrintHex(a);printf("/");bnPrintHex(b);printf("=");bnPrintHex(n);printf("|-10");printf("\n");
+
+    bnSetInt(a, 0x13);
+    bnSetInt(b, -0x2);
+    bnChLen(b,3*BNCHUNK);
+    bnDiv(a,b,n);
+    bnPrintHex(a);printf("/");bnPrintHex(b);printf("=");bnPrintHex(n);printf("|-10");printf("\n");
+
+    bnSetInt(a, -0x13);
+    bnSetInt(b, -0x2);
+    bnChLen(b,3*BNCHUNK);
+    bnDiv(a,b,n);
+    bnPrintHex(a);printf("/");bnPrintHex(b);printf("=");bnPrintHex(n);printf("|9");printf("\n");
+
+    bnSetInt(a, 0x12222);
+    bnSetInt(b, 0x2);
+    bnChLen(b,3*BNCHUNK);
+    bnDiv(a,b,n);
+    bnPrintHex(a);printf("/");bnPrintHex(b);printf("=");bnPrintHex(n);printf("|9");printf("\n");
+
+    bnSetInt(a, -0x12222);
+    bnSetInt(b, 0x2);
+    bnChLen(b,3*BNCHUNK);
+    bnDiv(a,b,n);
+    bnPrintHex(a);printf("/");bnPrintHex(b);printf("=");bnPrintHex(n);printf("|-9");printf("\n");
+
+    bnSetInt(a, 0x12222);
+    bnSetInt(b, -0x2);
+    bnChLen(b,3*BNCHUNK);
+    bnDiv(a,b,n);
+    bnPrintHex(a);printf("/");bnPrintHex(b);printf("=");bnPrintHex(n);printf("|-9");printf("\n");
+
+    bnSetInt(a, -0x12222);
+    bnSetInt(b, -0x2);
+    bnChLen(b,3*BNCHUNK);
+    bnDiv(a,b,n);
+    bnPrintHex(a);printf("/");bnPrintHex(b);printf("=");bnPrintHex(n);printf("|9");printf("\n");
+
+    bnSetInt(a, 0x12223);
+    bnSetInt(b, 0x2);
+    bnChLen(b,3*BNCHUNK);
+    bnDiv(a,b,n);
+    bnPrintHex(a);printf("/");bnPrintHex(b);printf("=");bnPrintHex(n);printf("|9");printf("\n");
+
+    bnSetInt(a, -0x12223);
+    bnSetInt(b, 0x2);
+    bnChLen(b,3*BNCHUNK);
+    bnDiv(a,b,n);
+    bnPrintHex(a);printf("/");bnPrintHex(b);printf("=");bnPrintHex(n);printf("|-10");printf("\n");
+
+    bnSetInt(a, 0x12223);
+    bnSetInt(b, -0x2);
+    bnChLen(b,3*BNCHUNK);
+    bnDiv(a,b,n);
+    bnPrintHex(a);printf("/");bnPrintHex(b);printf("=");bnPrintHex(n);printf("|-10");printf("\n");
+
+    bnSetInt(a, -0x12223);
+    bnSetInt(b, -0x2);
+    bnChLen(b,3*BNCHUNK);
+    bnDiv(a,b,n);
+    bnPrintHex(a);printf("/");bnPrintHex(b);printf("=");bnPrintHex(n);printf("|9");printf("\n");
+
+    printf("---------------------\n");
+
+    bnSetInt(a, 0xF73E);
+    bnSetInt(b, 0x233);
+    bnChLen(b,3*BNCHUNK);
+    bnDiv(a,b,n);
+    bnPrintHex(a);printf("/");bnPrintHex(b);printf("=");bnPrintHex(n);printf("\n");
+
+    bnSetInt(a, -0x12223);
+    bnSetInt(b, -0x23333);
+    bnChLen(b,3*BNCHUNK);
+    bnDiv(a,b,n);
+    bnPrintHex(a);printf("/");bnPrintHex(b);printf("=");bnPrintHex(n);printf("|9");printf("\n");
+  }
+  // bnMod
+  {INIT;
+    reset_;
+    bnSetInt(a, 0x12);
+    bnSetInt(b, 0x5);
+    bnChLen(b,3*BNCHUNK);
+    bnMod(a,b,n);
+    bnPrintHex(a);printf(" %% ");bnPrintHex(b);printf("=");bnPrintHex(n);printf("\n");
+
+    bnSetInt(a, 0x12);
+    bnSetInt(b, 0x100);
+    bnChLen(b,3*BNCHUNK);
+    bnMod(a,b,n);
+    bnPrintHex(a);printf(" %% ");bnPrintHex(b);printf("=");bnPrintHex(n);printf("\n");
+
+    bnSetInt(a, -0x12);
+    bnSetInt(b, 0x5);
+    bnChLen(b,3*BNCHUNK);
+    bnMod(a,b,n);
+    bnPrintHex(a);printf(" %% ");bnPrintHex(b);printf("=");bnPrintHex(n);printf("\n");
   }
 
   printf("=====================================\n");
