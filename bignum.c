@@ -206,7 +206,7 @@ Reterr bnMul(const Bignum *a, const Bignum *b, Bignum *n) {
 Reterr bnSetFDeg(Bignum *n, int64_t deg) {
   int _err = 0;
   ERR_CH(bnSetInt(n, 0));
-  ERR_CH(bnChLen(n, deg / 2));
+  ERR_CH(bnChLen(n, deg / 2 + 1));
   n->num[deg / 2] = (deg % 2) ? 0xF0 : 0x0F;
   return 0;
 }
