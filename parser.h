@@ -40,9 +40,16 @@ typedef struct _Program {
   Token *tokens;
 } Program;
 
+typedef struct _LineStr {
+  uint64_t globalLine;
+  uint64_t globalPos;
+  unsigned char *str;
+} LineStr;
+
 #define TOKENS_BLOCK (100)
 #define STR_BLOCK (1000)
 
-Reterr parser(FILE *f, Program *prg, uint64_t *globalPos);
+Reterr parser(FILE *f, Program *prg, LineStr *l);
+char *getErrorMsg(int _err);
 
 #endif // PARSER_H

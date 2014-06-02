@@ -142,7 +142,7 @@ Reterr readToken(unsigned char *str, uint64_t *pos, Token *tk) {
         if ('<' == *(str + *(pos))) {
           tk->tp = less;
         } else {
-          return PARSE_ERR_EQ;
+          return PARSE_ERR_LESS;
         }
       }
       break;
@@ -190,19 +190,20 @@ Reterr readToken(unsigned char *str, uint64_t *pos, Token *tk) {
 }
 
 
-Reterr parser(FILE *f, Program *prg, uint64_t *globalPos) {
+Reterr parser(FILE *f, Program *prg, LineStr *l) {
   int ch = 0;
   int _err = 0;
-  unsigned char *str = NULL;
   uint64_t strLen = 0;
   uint64_t strPos = 0;
   uint64_t pos = 0;
 
-
-  str = calloc(STR_BLOCK, sizeof(unsigned char));
-  ERR_CH(!check_alloc(str));
+  l->str = calloc(STR_BLOCK, sizeof(unsigned char));
+  ERR_CH(!check_alloc(l->str));
   strLen = STR_BLOCK;
   strPos = 0;
+
+  l->globalLine = 1;
+  l->globalPos = 0;
 
   prg->len = 0;
 
@@ -217,14 +218,20 @@ Reterr parser(FILE *f, Program *prg, uint64_t *globalPos) {
       }
     }
 
-    (*globalPos)++;
+    (l->globalPos)++;
+
+    if ('\n' == ch) {
+      (l->globalLine)++;
+      l->globalPos = 0;
+    }
+
     if (!isspace(ch))
-      *(str + strPos++) = ch;
+      *(l->str + strPos++) = ch;
 
     if (strLen == strPos) {
       strLen += STR_BLOCK;
-      str = realloc(str, strLen);
-      ERR_CH(!check_alloc(str));
+      l->str = realloc(l->str, strLen);
+      ERR_CH(!check_alloc(l->str));
     }
 
     if (';' == ch) {
@@ -233,9 +240,12 @@ Reterr parser(FILE *f, Program *prg, uint64_t *globalPos) {
         ERR_CH(!check_alloc(prg->tokens));
       }
       pos = 0;
-      ERR_CH(readToken(str, &pos, &prg->tokens[prg->len++]));
+      _err = readToken(l->str, &pos, &prg->tokens[prg->len++]);
+      if ((';' != l->str[pos]) && (!_err)) _err = PARSE_ERR_NOT_SEMICOLON;
+      if (_err) l->globalPos -= (strPos - pos);
+      ERR_VAR_CH;
 
-      memset(str, 0, strPos);
+      memset(l->str, 0, strPos);
       strPos = 0;
     }
 

@@ -23,10 +23,11 @@ typedef int Reterr;
 #define PARSE_ERR_EQ (21)
 #define PARSE_ERR_COMMAND (22)
 #define PARSE_ERR_GREAT (23)
-#define PARSE_ERR_ARROW_FIRST (24)
-#define PARSE_ERR_ARROW_SECOND (25)
-#define PARSE_ERR_COPY_LAST_OP_NUM (26)
-#define PARSE_ERR_NOT_SEMICOLON (27)
+#define PARSE_ERR_LESS (24)
+#define PARSE_ERR_ARROW_FIRST (25)
+#define PARSE_ERR_ARROW_SECOND (26)
+#define PARSE_ERR_COPY_LAST_OP_NUM (27)
+#define PARSE_ERR_NOT_SEMICOLON (28)
 
 Reterr check_alloc(void *var);
 
