@@ -206,7 +206,7 @@ Reterr readToken(unsigned char *str, uint64_t *pos, Token *tk) {
   ERR_CH(initNum(&tk->one));
   ERR_CH(readNum(str, pos, tk->one));
 
-  if (tk->tp < 10) {
+  if (tk->tp <= 9) {
     ERR_CH(initNum(&tk->two));
     ERR_CH(readNum(str, pos, tk->two));
   }

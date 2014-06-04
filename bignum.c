@@ -67,7 +67,7 @@ int bnSetInt(Bignum *n, const int64_t _var) {
 
 uint64_t bnBignumToUInt64(const Bignum *a) {
   uint64_t i = 0, len = 0, num = 0;
-  for(len = a->len; len != 0; len++) {
+  for(len = a->len; len != 0; len--) {
     i = len - 1;
     num *= 0x10;
     num += (uint64_t) a->num[i];
@@ -329,10 +329,11 @@ void bnPrintHex(const Bignum *a) {
     if (!a->num[i-1] && !isWrite) {
       firstNul++;
     } else {
-      if (!isWrite) printf("[%"PRIu64"]", firstNul);
+      //if (!isWrite) printf("[%"PRIu64"]", firstNul);
       isWrite = 1;
       printf("%.2X",a->num[i-1]);
     }
   }
-  if (!isWrite) printf("[%"PRIu64"]", firstNul);
+  //if (!isWrite) printf("[%"PRIu64"]", firstNul);
+  if (!isWrite) printf("00");
 }

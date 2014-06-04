@@ -31,9 +31,12 @@ int main(void)
     printf("\"%s\"\n", l.str);
     printf(" _% *s\n", (int) l.globalPos, "^");
     printf("%s\n\n", getErrorMsg(_err));
+    free(l.str);
+    fclose(f);
+    return 1;
   }
-
   free(l.str);
+
 
   while (state->cs < state->prg->len) {
     printf("===== STEP =====\n");

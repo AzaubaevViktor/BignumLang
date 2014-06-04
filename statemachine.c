@@ -35,10 +35,8 @@ Reterr machine(State *state) {
   int isJump = 0;
   Token *tk;
   Bignum *one = NULL, *two = NULL, *res = NULL;
-  Bignum *_nul = NULL, *_one = NULL;
+  Bignum *_nul = NULL;
   ERR_CH(bnInit(&_nul, 0));
-  ERR_CH(bnInit(&_one, 0));
-  ERR_CH(bnSetInt(_one, 1));
 
   isJump = 0;
 
@@ -95,10 +93,10 @@ Reterr machine(State *state) {
           _cmp = (-1 == _cmp);
           break;
         case greatEq:
-          _cmp = (1 != _cmp);
+          _cmp = (-1 != _cmp);
           break;
         case lessEq:
-          _cmp = (-1 != _cmp);
+          _cmp = (1 != _cmp);
           break;
         default:
           break;
@@ -109,7 +107,7 @@ Reterr machine(State *state) {
   } else if (tk->tp == copy) {
     ERR_CH(rgSet(state->regs, tk->res->n, one));
   } else if (tk->tp == go) {
-    if (0 == bnCmp(one, _one)) {
+    if (0 != bnCmp(one, _nul)) {
       state->cs = bnBignumToUInt64(res);
       isJump = 1;
     }
