@@ -11,12 +11,15 @@ int main(void)
   FILE *f;
   LineStr l;
 
+  printf("Statemachine version compatibility : %s\n", STATEMACHINE_COMPATIBILITY);
+  printf("Parser version compatibility       : %s\n", PARSER_COMPATIBILITY);
+
   cnt.quiet = 0;
   printf("TESTS:\n");
   //test_bignum(&cnt);
 
   printf("PROGRAMM:\n");
-  f = fopen("./test.bin","rt");
+  f = fopen("./memory.bin","rt");
   if (!f) {
     printf("File open error\n");
     return 0;

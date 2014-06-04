@@ -1,6 +1,8 @@
 #ifndef STATEMACHINE_H
 #define STATEMACHINE_H
 
+#define STATEMACHINE_COMPATIBILITY "0.0.3a"
+
 #include <stdio.h>
 #include <inttypes.h>
 #include "parser.h"

@@ -1,6 +1,8 @@
 #ifndef PARSER_H
 #define PARSER_H
 
+#define PARSER_COMPATIBILITY "0.0.3a"
+
 #include <stdio.h>
 #include <wchar.h>
 #include <stdbool.h>
