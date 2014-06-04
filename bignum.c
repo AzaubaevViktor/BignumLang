@@ -3,7 +3,7 @@
 #define GET_CHUNK_ALIGN(l) (ceil((l), BNCHUNK) * BNCHUNK)
 
 Reterr bnInit(Bignum **n, uint64_t len) {
-  *n = calloc(1,sizeof(Bignum));
+  *n = (Bignum *) calloc(1, sizeof(Bignum));
   MEM_ERR_CH(*n);
 
   (*n)->len = GET_CHUNK_ALIGN(len);
@@ -203,9 +203,6 @@ Reterr _bnSum(const Bignum *a, const Bignum *b, Bignum *n, bool _signSec) {
     ERR_CH(bnChLen(n, n->len + 1));
         n->num[i] = carry;
   }
-
-  bnFree(_a);
-  bnFree(_b);
 
   return 0;
 }

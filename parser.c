@@ -20,7 +20,7 @@ unsigned char _sym2num(int ch) {
 
 Reterr initNum(Num **n) {
   int _err;
-  *n = calloc(1, sizeof(Num));
+  *n = (Num *) calloc(1, sizeof(Num));
   MEM_ERR_CH(*n);
   ERR_CH(bnInit(&((*n)->n), 0));
   return 0;
