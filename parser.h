@@ -49,6 +49,10 @@ typedef struct _LineStr {
 #define TOKENS_BLOCK (100)
 #define STR_BLOCK (1000)
 
+void numFree(Num *n);
+void tokenFree(Token *tk);
+Reterr programInit(Program **prg);
+void programFree(Program *prg);
 Reterr parser(FILE *f, Program *prg, LineStr *l);
 char *getErrorMsg(int _err);
 

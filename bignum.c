@@ -18,8 +18,11 @@ Reterr bnInit(Bignum **n, uint64_t len) {
 
 
 void bnFree(Bignum *n) {
-  free(n->num);
-  free(n);
+  if (n) {
+    if (n->num)
+      free(n->num);
+    free(n);
+  }
 }
 
 
@@ -162,16 +165,16 @@ Reterr _bnSum(const Bignum *a, const Bignum *b, Bignum *n, bool _signSec) {
 
   if (signFir == signSec) {
     isSub = 1;
-    _a = (Bignum *) a;
-    _b = (Bignum *) b;
+    ERR_CH(bnCopy(a, _a));
+    ERR_CH(bnCopy(b, _b));
     n->sign = a->sign; // == b->sign;
     signFir = 1;
     signSec = 1;
   } else {
     isSub = -1;
     bMoreA = (-1 == bnCmpAbs(a,b));
-    bnCopy(bMoreA ? b : a, _a);
-    bnCopy(bMoreA ? a : b, _b);
+    ERR_CH(bnCopy(bMoreA ? b : a, _a));
+    ERR_CH(bnCopy(bMoreA ? a : b, _b));
     if (bMoreA) {
       res = signFir;
       signFir = signSec;
@@ -203,6 +206,9 @@ Reterr _bnSum(const Bignum *a, const Bignum *b, Bignum *n, bool _signSec) {
     ERR_CH(bnChLen(n, n->len + 1));
         n->num[i] = carry;
   }
+
+  bnFree(_a);
+  bnFree(_b);
 
   return 0;
 }

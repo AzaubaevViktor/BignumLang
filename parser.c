@@ -1,5 +1,6 @@
 #include <parser.h>
 
+
 int _isDigit(int ch) {
   return
       (('0' <= ch) && (ch <= '9')) ||
@@ -28,8 +29,38 @@ Reterr initNum(Num **n) {
 
 
 void numFree(Num *n) {
-  free(n->n);
-  free(n);
+  if (n) {
+    bnFree(n->n);
+    free(n);
+  }
+}
+
+
+void tokenFree(Token *tk) {
+  if (tk) {
+    numFree(tk->res);
+    numFree(tk->two);
+    numFree(tk->one);
+    //free(tk);
+  }
+}
+
+
+Reterr programInit(Program **prg) {
+  *prg = (Program *) calloc(1, sizeof(Program));
+  MEM_ERR_CH(*prg);
+  return 0;
+}
+
+void programFree(Program *prg) {
+  uint64_t i = 0;
+  if (prg) {
+    for (i=prg->len; i != 0; i--) {
+      tokenFree(prg->tokens + i - 1);
+    }
+    free(prg->tokens);
+    free(prg);
+  }
 }
 
 
@@ -244,7 +275,9 @@ Reterr parser(FILE *f, Program *prg, LineStr *l) {
         MEM_ERR_CH(prg->tokens);
       }
       pos = 0;
-      _err = readToken(l->str, &pos, &(prg->tokens[(prg->len)++]));
+      _err = readToken(l->str, &pos, &(prg->tokens[prg->len]));
+      (prg->len)++;
+
       if ((';' != l->str[pos]) && (!_err)) _err = PARSE_ERR_NOT_SEMICOLON;
       if (_err) l->globalPos -= (strPos - pos);
       ERR_VAR_CH;

@@ -10,6 +10,19 @@ Reterr rgInit(Regs **regs) {
 }
 
 
+void rgFree(Regs *regs) {
+  uint64_t i = 0;
+  if (regs) {
+    for (i=0; i < regs->len; i++) {
+      bnFree(regs->reg[i].key);
+      bnFree(regs->reg[i].val);
+    }
+    free(regs->reg);
+    free(regs);
+  }
+}
+
+
 Reterr _rgAdd(Regs *regs, Bignum *key, Bignum *val) {
   int _err = 0;
   regs->reg = (Reg *) realloc(regs->reg, (regs->len + 1) * sizeof(Reg));

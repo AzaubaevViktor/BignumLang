@@ -13,6 +13,8 @@ typedef struct _State {
   uint64_t op;
 } State;
 
+Reterr machineInitState(State **state);
+void machineFreeState(State *state);
 Reterr machine(State *state);
 void printState(State *state);
 

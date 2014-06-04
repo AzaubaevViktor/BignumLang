@@ -19,6 +19,7 @@ typedef struct _Regs {
 #include "regs.h"
 
 Reterr rgInit(Regs **regs);
+void rgFree(Regs *regs);
 Reterr _rgAdd(Regs *regs, Bignum *key, Bignum *val);
 Reterr rgGet(Regs *regs, Bignum *key, Bignum **val);
 Reterr rgSet(Regs *regs, Bignum *key, Bignum *val);
