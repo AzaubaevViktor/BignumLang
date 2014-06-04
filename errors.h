@@ -33,7 +33,7 @@ typedef int Reterr;
 
 Reterr check_alloc(void *var);
 #define MEM_ERR_CH(var) \
-  printf("Allocate '%s' on `%s`:`%d` '0x%X'\n", # var, __FILE__, __LINE__, (unsigned int) (var));\
+  /*printf("Allocate '%s' on `%s`:`%d` '0x%X'\n", # var, __FILE__, __LINE__, (unsigned int) (var));*/\
   if (!check_alloc(var)) return MEMORY_ALLOCATE_ERROR;
 #define ERR_VAR_CH if (_err) return _err
 #define ERR_CH(func) _err = (func); ERR_VAR_CH

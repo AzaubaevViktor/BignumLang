@@ -5,19 +5,20 @@ Reterr rgInit(Regs **regs) {
   *regs = calloc(1, sizeof(Regs));
   MEM_ERR_CH(*regs);
   (*regs)->len = 0;
-  (*regs)->regs = NULL;
+  (*regs)->reg = NULL;
   return 0;
 }
 
 
 Reterr _rgAdd(Regs *regs, Bignum *key, Bignum *val) {
   int _err = 0;
-  regs->regs = realloc(regs->regs, (++(regs->len)) * sizeof(Reg));
-  MEM_ERR_CH(regs->regs);
-  ERR_CH(bnInit(&(regs->regs[regs->len].key), 0));
-  ERR_CH(bnInit(&(regs->regs[regs->len].val), 0));
-  ERR_CH(bnCopy(key, regs->regs[regs->len].key));
-  ERR_CH(bnCopy(val, regs->regs[regs->len].val));
+  regs->reg = (Reg *) realloc(regs->reg, (regs->len + 1) * sizeof(Reg));
+  MEM_ERR_CH(regs->reg);
+  ERR_CH(bnInit(&((regs->reg[regs->len]).key), 0));
+  ERR_CH(bnInit(&((regs->reg[regs->len]).val), 0));
+  ERR_CH(bnCopy(key, (regs->reg[regs->len]).key));
+  ERR_CH(bnCopy(val, (regs->reg[regs->len]).val));
+  (regs->len)++;
   return 0;
 }
 
@@ -26,8 +27,8 @@ Reterr rgGet(Regs *regs, Bignum *key, Bignum **val) {
   uint64_t i = 0;
 
   for (i=0; i < regs->len; i++) {
-    if (!bnCmp(key, regs->regs[regs->len].key)) {
-      *val = regs->regs[regs->len].val;
+    if (!bnCmp(key, regs->reg[i].key)) {
+      *val = regs->reg[i].val;
       return 0;
     }
   }
@@ -37,7 +38,7 @@ Reterr rgGet(Regs *regs, Bignum *key, Bignum **val) {
 Reterr rgSet(Regs *regs, Bignum *key, Bignum *val) {
   int _err;
   Bignum *_val = NULL;
-  if (RUNTIME_REGISTER_NOT_SET == rgGet(regs, key, &val)) {
+  if (RUNTIME_REGISTER_NOT_SET == rgGet(regs, key, &_val)) {
     ERR_CH(_rgAdd(regs, key, val));
   } else {
     ERR_CH(bnCopy(val, _val));

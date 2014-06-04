@@ -35,12 +35,15 @@ Reterr machine(State *state) {
       }
       (state->op)++;
       ERR_CH(bnSum(one, two, res));
+      rgSet(state->regs, tk->res->n, res);
       break;
 
     default:
       ;
       break;
   }
+
+  (state->cs)++;
   return 0;
 }
 
@@ -63,18 +66,18 @@ void printToken(Token *tk) {
 void printState(State *state) {
   uint64_t i = 0;
   printf("CS: `%"PRIu64"`\n", state->cs);
-  printf("Token:");
-  printToken(&state->prg->tokens[state->cs]);
-  printf("\n");
   printf("Regs:\n");
 
   for (i=0; i < state->regs->len; i++) {
     printf("`");
-    bnPrintHex(state->regs->regs[i].key);
+    bnPrintHex(state->regs->reg[i].key);
     printf("`: ");
 
     printf("`");
-    bnPrintHex(state->regs->regs[i].val);
+    bnPrintHex(state->regs->reg[i].val);
     printf("`\n");
   }
+  printf("Token:");
+  printToken(&state->prg->tokens[state->cs]);
+  printf("\n");
 }

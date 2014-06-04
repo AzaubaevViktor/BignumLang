@@ -13,7 +13,7 @@ typedef struct _Reg {
 
 typedef struct _Regs {
   uint64_t len;
-  Reg *regs;
+  Reg *reg;
 } Regs;
 
 #include "regs.h"

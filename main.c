@@ -34,9 +34,12 @@ int main(void)
   state.prg = &prg;
   rgInit(&state.regs);
 
-  _err = machine(&state);
+  while (!_err) {
+    printf("===== STEP =====\n");
+    printState(&state);
+    _err = machine(&state);
+  }
   if (_err) printf("'%s' on operand `%"PRIu64"`\n", getErrorMsg(_err), state.op);
-  printState(&state);
   fclose(f);
   printf("Program End!\n");
   return 0;

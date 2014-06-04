@@ -12,7 +12,7 @@ unsigned char _sym2num(int ch) {
     return ch - '0';
   }
   if (('A' <= ch) && (ch <= 'F')) {
-    return ch - 'A';
+    return ch - 'A' + 10;
   }
   return 0;
 }
