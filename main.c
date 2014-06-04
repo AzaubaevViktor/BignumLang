@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "error.h"
 #include "test.h"
 #include "statemachine.h"
 
@@ -25,11 +26,17 @@ int main(void)
   if (_err) {
     printf("On line `%"PRIu64"`, pos: `%"PRIu64"`:\n", l.globalLine, l.globalPos);
     printf("\"%s\"\n", l.str);
-    printf(" % *s\n", (int) l.globalPos, "^");
+    printf(" _% *s\n", (int) l.globalPos, "^");
     printf("%s\n\n", getErrorMsg(_err));
   }
 
-  machine(&state, &prg);
+  state.cs = 0;
+  state.prg = &prg;
+  rgInit(&state.regs);
+
+  _err = machine(&state);
+  if (_err) printf("'%s' on operand `%"PRIu64"`\n", getErrorMsg(_err), state.op);
+  printState(&state);
   fclose(f);
   printf("Program End!\n");
   return 0;

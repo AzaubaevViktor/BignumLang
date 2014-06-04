@@ -400,6 +400,11 @@ int test_bignum(TestContext *cnt) {
     bnPrintHex(a);printf(" %% ");bnPrintHex(b);printf("=");bnPrintHex(n);printf("\n");
   }
 
+  bnFree(a);
+  bnFree(b);
+  bnFree(c);
+  bnFree(n);
+
   printf("=====================================\n");
   return 0;
 }

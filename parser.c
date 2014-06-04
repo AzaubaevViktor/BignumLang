@@ -21,8 +21,15 @@ unsigned char _sym2num(int ch) {
 Reterr initNum(Num **n) {
   int _err;
   *n = calloc(1, sizeof(Num));
-  ERR_CH(!check_alloc(*n));
+  MEM_ERR_CH(*n);
+  ERR_CH(bnInit(&((*n)->n), 0));
   return 0;
+}
+
+
+void numFree(Num *n) {
+  free(n->n);
+  free(n);
 }
 
 
@@ -47,7 +54,6 @@ Reterr readNum(unsigned char *str, uint64_t *pos, Num *num) {
 
   (*pos)++;
 
-  ERR_CH(bnInit(&(num->n),0));
   ERR_CH(bnInit(&ten,0));
   ERR_CH(bnInit(&res,0));
   ERR_CH(bnInit(&resDig,0));
@@ -70,9 +76,9 @@ Reterr readNum(unsigned char *str, uint64_t *pos, Num *num) {
     (*pos)++;
   }
 
-  free(ten);
-  free(res);
-  free(resDig);
+  bnFree(ten);
+  bnFree(res);
+  bnFree(resDig);
 
   return 0;
 }
@@ -167,19 +173,16 @@ Reterr readToken(unsigned char *str, uint64_t *pos, Token *tk) {
 
 
   ERR_CH(initNum(&tk->one));
-  ERR_CH(bnInit(&(tk->one->n), 0));
   ERR_CH(readNum(str, pos, tk->one));
 
   if (tk->tp < 10) {
     ERR_CH(initNum(&tk->two));
-    ERR_CH(bnInit(&tk->two->n, 0));
     ERR_CH(readNum(str, pos, tk->two));
   }
 
   ERR_CH(readArrow(str,pos));
 
   ERR_CH(initNum(&tk->res));
-  ERR_CH(bnInit(&tk->res->n, 0));
   ERR_CH(readNum(str, pos, tk->res));
 
   // Check result num
@@ -198,7 +201,7 @@ Reterr parser(FILE *f, Program *prg, LineStr *l) {
   uint64_t pos = 0;
 
   l->str = calloc(STR_BLOCK, sizeof(unsigned char));
-  ERR_CH(!check_alloc(l->str));
+  MEM_ERR_CH(l->str);
   strLen = STR_BLOCK;
   strPos = 0;
 
@@ -206,6 +209,7 @@ Reterr parser(FILE *f, Program *prg, LineStr *l) {
   l->globalPos = 0;
 
   prg->len = 0;
+  prg->tokens = 0;
 
   while (1) {
     ch = fgetc(f);
@@ -230,17 +234,17 @@ Reterr parser(FILE *f, Program *prg, LineStr *l) {
 
     if (strLen == strPos) {
       strLen += STR_BLOCK;
-      l->str = realloc(l->str, strLen);
-      ERR_CH(!check_alloc(l->str));
+      l->str = (unsigned char *)realloc(l->str, strLen * sizeof(unsigned char));
+      MEM_ERR_CH(l->str);
     }
 
     if (';' == ch) {
       if (!(prg->len % TOKENS_BLOCK)) {
-        prg->tokens = realloc(prg->tokens, prg->len + TOKENS_BLOCK);
-        ERR_CH(!check_alloc(prg->tokens));
+        prg->tokens = (Token *) realloc(prg->tokens, (prg->len + TOKENS_BLOCK) * sizeof(Token));
+        MEM_ERR_CH(prg->tokens);
       }
       pos = 0;
-      _err = readToken(l->str, &pos, &prg->tokens[prg->len++]);
+      _err = readToken(l->str, &pos, &(prg->tokens[(prg->len)++]));
       if ((';' != l->str[pos]) && (!_err)) _err = PARSE_ERR_NOT_SEMICOLON;
       if (_err) l->globalPos -= (strPos - pos);
       ERR_VAR_CH;
@@ -251,6 +255,5 @@ Reterr parser(FILE *f, Program *prg, LineStr *l) {
 
   }
 
-  //free(str); Programm drop with sigsegv
   return 0;
 }

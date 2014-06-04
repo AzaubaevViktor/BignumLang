@@ -1,14 +1,13 @@
 #include "bignum.h"
 
-#define MEM_ERR_CH(var) \
-  if (!check_alloc(var)) return MEMORY_ALLOCATE_ERROR;
-
+#define GET_CHUNK_ALIGN(l) (ceil((l), BNCHUNK) * BNCHUNK)
 
 Reterr bnInit(Bignum **n, uint64_t len) {
   *n = calloc(1,sizeof(Bignum));
   MEM_ERR_CH(*n);
 
-  (*n)->len = ceil(len, BNCHUNK);
+  (*n)->len = GET_CHUNK_ALIGN(len);
+  (*n)->len = (*n)->len ? (*n)->len : BNCHUNK;
 
   (*n)->num = calloc((*n)->len, sizeof(unsigned char));
   MEM_ERR_CH((*n)->num);
@@ -18,11 +17,17 @@ Reterr bnInit(Bignum **n, uint64_t len) {
 }
 
 
+void bnFree(Bignum *n) {
+  free(n->num);
+  free(n);
+}
+
+
 int bnChLen(Bignum *n, const int64_t len) {
   uint64_t oldLen = n->len;
-  uint64_t newLen = ceil(len,BNCHUNK)*BNCHUNK;
+  uint64_t newLen = GET_CHUNK_ALIGN(len);
   newLen = newLen ? newLen : BNCHUNK;
-  n->num = realloc(n->num, newLen*sizeof(unsigned char));
+  n->num = (unsigned char *) realloc(n->num, newLen*sizeof(unsigned char));
   MEM_ERR_CH(n->num);
   if (newLen > oldLen)
     memset(n->num + oldLen, 0, newLen-oldLen);
@@ -43,7 +48,7 @@ int bnSetInt(Bignum *n, const int64_t _var) {
   int _err = 0;
   uint64_t i = 0;
   int64_t var = _var;
-  ERR_CH(bnChLen(n,ceil(8, BNCHUNK)));
+  ERR_CH(bnChLen(n,8));
 
   n->sign = (var < 0);
   var = (var < 0) ? -var : var;
@@ -57,10 +62,21 @@ int bnSetInt(Bignum *n, const int64_t _var) {
 }
 
 
+uint64_t bnBignumToUInt64(const Bignum *a) {
+  uint64_t i = 0, len = 0, num = 0;
+  for(len = a->len; len != 0; len++) {
+    i = len - 1;
+    num *= 0x10;
+    num += (uint64_t) a->num[i];
+  }
+  return num;
+}
+
+
 Reterr bnSetStr(Bignum *n, const char *str) {
   int _err = 0;
   uint64_t i = 0;
-  ERR_CH(bnChLen(n, ceil(strlen(str), BNCHUNK)));
+  ERR_CH(bnChLen(n,strlen(str)));
 
   n->sign = 1;
 
@@ -112,7 +128,6 @@ int _bnCmp(const Bignum *a, const Bignum *b, bool isSignCheck) {
 Reterr bnCopy(const Bignum *a, Bignum *n) {
   int _err = 0;
   uint64_t i = 0;
-  ERR_CH(bnSetInt(n, 0));
   ERR_CH(bnChLen(n, a->len));
 
   n->len = a->len;
@@ -140,7 +155,7 @@ Reterr _bnSum(const Bignum *a, const Bignum *b, Bignum *n, bool _signSec) {
   int16_t trans = 0;
 
   ERR_CH(bnNul(n));
-  ERR_CH(bnChLen(n, max(a->len, b->len)));
+  ERR_CH(bnChLen(n, max(a->len, b->len) + 1));
 
   ERR_CH(bnInit(&_a,0));
   ERR_CH(bnInit(&_b,0));
@@ -188,6 +203,9 @@ Reterr _bnSum(const Bignum *a, const Bignum *b, Bignum *n, bool _signSec) {
     ERR_CH(bnChLen(n, n->len + 1));
         n->num[i] = carry;
   }
+
+  bnFree(_a);
+  bnFree(_b);
 
   return 0;
 }
@@ -239,7 +257,7 @@ Reterr bnDiv(const Bignum *a, const Bignum *b, Bignum *n) {
   // Memory leaks when error
   ERR_CH(bnInit(&nul,0));
   if (!bnCmp(a,nul)) {
-    free(nul);
+    bnFree(nul);
     return DIVISION_BY_ZERO;
   }
   ERR_CH(bnInit(&deg, a->len - b->len + 1)); // delete +1
@@ -271,11 +289,11 @@ Reterr bnDiv(const Bignum *a, const Bignum *b, Bignum *n) {
     ERR_CH(bnCopy(res, n));
   }
 
-  free(nul);
-  free(deg);
-  free(res);
-  free(divide);
-  free(_a);
+  bnFree(nul);
+  bnFree(deg);
+  bnFree(res);
+  bnFree(divide);
+  bnFree(_a);
   return 0;
 }
 
@@ -293,8 +311,8 @@ Reterr bnMod(const Bignum *a, const Bignum *b, Bignum *n) {
 
   n->sign = 0;
 
-  free(div);
-  free(divMulB);
+  bnFree(div);
+  bnFree(divMulB);
   return 0;
 }
 
@@ -315,8 +333,3 @@ void bnPrintHex(const Bignum *a) {
   }
   if (!isWrite) printf("[%"PRIu64"]", firstNul);
 }
-
-
-#undef MEM_ERR_CH
-#undef ERR_VAR_CH
-#undef ERR_CH

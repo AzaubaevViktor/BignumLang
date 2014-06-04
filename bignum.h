@@ -8,7 +8,7 @@
 #include <errors.h>
 #include <string.h>
 
-#define BNCHUNK (1)
+#define BNCHUNK (8)
 
 #define ceil(a,b) (((a) / (b)) + !!((a) % (b)))
 #define min(a,b) (((a) < (b)) ? (a) : (b))
@@ -21,9 +21,11 @@ typedef struct _Bignum {
 } Bignum;
 
 Reterr bnInit(Bignum **n, uint64_t len);
+void bnFree(Bignum *n);
 int bnChLen(Bignum *n, const int64_t len);
 Reterr bnNul(Bignum *n);
 int bnSetInt(Bignum *n, const int64_t _var);
+uint64_t bnBignumToUInt64(const Bignum *a);
 Reterr bnSetStr(Bignum *n, const char *str);
 uint64_t bnGetLen(const Bignum *a);
 int _bnCmp(const Bignum *a, const Bignum *b, bool isSignCheck);
@@ -39,7 +41,6 @@ Reterr bnDiv(const Bignum *a, const Bignum *b, Bignum *n);
 Reterr bnMod(const Bignum *a, const Bignum *b, Bignum *n);
 void bnPrintHex(const Bignum *a);
 
-#define ERR_VAR_CH if (_err) return _err
-#define ERR_CH(func) _err = (func); ERR_VAR_CH
+
 
 #endif // BIGNUM_H

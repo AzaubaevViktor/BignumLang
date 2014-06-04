@@ -54,6 +54,10 @@ char *getErrorMsg(int _err) {
       return
           "Expected `;` after command";
       break;
+    case RUNTIME_REGISTER_NOT_SET:
+      return
+          "Runtime error: register not set";
+      break;
     default:
       return "Unknown error";
       break;
