@@ -1,7 +1,7 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#define PARSER_COMPATIBILITY "0.0.3a"
+#define PARSER_COMPATIBILITY "APIv4"
 
 #include <stdio.h>
 #include <wchar.h>

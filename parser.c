@@ -216,10 +216,6 @@ Reterr readToken(unsigned char *str, uint64_t *pos, Token *tk) {
   ERR_CH(initNum(&tk->res));
   ERR_CH(readNum(str, pos, tk->res));
 
-  // Check result num
-  if ((go != tk->tp) && (0 == tk->res->isReg))
-    return PARSE_ERR_COPY_LAST_OP_NUM;
-
   return 0;
 }
 

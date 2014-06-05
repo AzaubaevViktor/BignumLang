@@ -1,7 +1,7 @@
 #ifndef STATEMACHINE_H
 #define STATEMACHINE_H
 
-#define STATEMACHINE_COMPATIBILITY "0.0.3a"
+#define STATEMACHINE_COMPATIBILITY "APIv4"
 
 #include <stdio.h>
 #include <inttypes.h>

@@ -18,7 +18,7 @@ void machineFreeState(State *state) {
 }
 
 
-Reterr getNum(Num *num, Regs *regs, Bignum **val) {
+Reterr getNumByReg(Regs *regs, Num *num, Bignum **val) {
   int _err;
   if (num->isReg) {
     ERR_CH(rgGet(regs, num->n, val));
@@ -34,7 +34,8 @@ Reterr machine(State *state) {
   int _cmp = 0;
   int isJump = 0;
   Token *tk;
-  Bignum *one = NULL, *two = NULL, *res = NULL;
+  Bignum *one = NULL, *two = NULL, *res = NULL, *reg = NULL;
+  Num _res;
   Bignum *_nul = NULL;
   ERR_CH(bnInit(&_nul, 0));
 
@@ -43,19 +44,30 @@ Reterr machine(State *state) {
   tk = &(state->prg->tokens[state->cs]);
 
   state->op = 0;
-  ERR_CH(getNum(tk->one, state->regs, &one));
+  ERR_CH(getNumByReg(state->regs, tk->one, &one));
   (state->op)++;
 
   if (tk->two) {
-    ERR_CH(getNum(tk->two, state->regs, &two));
+    ERR_CH(getNumByReg(state->regs, tk->two, &two));
     (state->op)++;
   }
 
-  _err = getNum(tk->res, state->regs, &res);
+  _err = getNumByReg(state->regs, tk->res, &res);
   if (RUNTIME_REGISTER_NOT_SET == _err) {
     rgSet(state->regs, tk->res->n, _nul);
-    ERR_CH(getNum(tk->res, state->regs, &res));
+    ERR_CH(getNumByReg(state->regs, tk->res, &res));
   }
+
+  if (go != tk->tp) {
+    _res.isReg = 1;
+    _res.n = res;
+    _err = getNumByReg(state->regs, &_res, &reg);
+    if (RUNTIME_REGISTER_NOT_SET == _err) {
+      rgSet(state->regs, res, _nul);
+      ERR_CH(getNumByReg(state->regs, &_res, &reg));
+    }
+  }
+
 
   (state->op)++;
 
@@ -63,19 +75,19 @@ Reterr machine(State *state) {
     if (tk->tp <= 4) {
       switch (tk->tp) {
         case sum:
-          ERR_CH(bnSum(one, two, res));
+          ERR_CH(bnSum(one, two, reg));
           break;
         case diff:
-          ERR_CH(bnDiff(one, two, res));
+          ERR_CH(bnDiff(one, two, reg));
           break;
         case mul:
-          ERR_CH(bnMul(one, two, res));
+          ERR_CH(bnMul(one, two, reg));
           break;
         case ddiv:
-          ERR_CH(bnDiv(one, two, res));
+          ERR_CH(bnDiv(one, two, reg));
           break;
         case mmod:
-          ERR_CH(bnMod(one, two, res));
+          ERR_CH(bnMod(one, two, reg));
           break;
         default:
           break;
@@ -101,11 +113,13 @@ Reterr machine(State *state) {
         default:
           break;
       }
-      bnSetInt(res, (uint64_t) _cmp);
+      bnSetInt(reg, (uint64_t) _cmp);
     }
-    ERR_CH(rgSet(state->regs, tk->res->n, res));
+    //ERR_CH(rgSet(state->regs, tk->res->n, res));
+    //ERR_CH(bnCopy(res, reg));
   } else if (tk->tp == copy) {
-    ERR_CH(rgSet(state->regs, tk->res->n, one));
+    //ERR_CH(rgSet(state->regs, tk->res->n, one));
+    ERR_CH(bnCopy(one, reg));
   } else if (tk->tp == go) {
     if (0 != bnCmp(one, _nul)) {
       state->cs = bnBignumToUInt64(res);

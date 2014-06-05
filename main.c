@@ -19,7 +19,7 @@ int main(void)
   //test_bignum(&cnt);
 
   printf("PROGRAMM:\n");
-  f = fopen("./memory.bin","rt");
+  f = fopen("./test.bin","rt");
   if (!f) {
     printf("File open error\n");
     return 0;

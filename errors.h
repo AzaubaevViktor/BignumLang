@@ -26,7 +26,6 @@ typedef int Reterr;
 #define PARSE_ERR_LESS (24)
 #define PARSE_ERR_ARROW_FIRST (25)
 #define PARSE_ERR_ARROW_SECOND (26)
-#define PARSE_ERR_COPY_LAST_OP_NUM (27)
 #define PARSE_ERR_NOT_SEMICOLON (28)
 
 #define RUNTIME_REGISTER_NOT_SET (30)

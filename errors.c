@@ -46,10 +46,6 @@ char *getErrorMsg(int _err) {
       return
           "Expected '>' after `-`";
       break;
-    case PARSE_ERR_COPY_LAST_OP_NUM:
-      return
-          "Last operand cannot be a number";
-      break;
     case PARSE_ERR_NOT_SEMICOLON:
       return
           "Expected `;` after command";
