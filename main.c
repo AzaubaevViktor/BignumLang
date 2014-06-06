@@ -19,7 +19,7 @@ int main(void)
   //test_bignum(&cnt);
 
   printf("PROGRAMM:\n");
-  f = fopen("./test.bin","rt");
+  f = fopen("./testInt.bin","rt");
   if (!f) {
     printf("File open error\n");
     return 0;
@@ -41,7 +41,7 @@ int main(void)
   free(l.str);
 
 
-  while (state->cs < state->prg->len) {
+  while ((state->cs < state->prg->len) & (!_err)) {
     printf("===== STEP =====\n");
     printState(state);
     _err = machine(state);
