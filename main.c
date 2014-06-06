@@ -26,6 +26,7 @@ int main(void)
   }
 
   machineInitState(&state);
+  state->quiet = 1;
   programInit(&(state->prg));
   _err = parser(f, state->prg, &l);
 
@@ -42,12 +43,15 @@ int main(void)
 
 
   while ((state->cs < state->prg->len) & (!_err)) {
-    printf("===== STEP =====\n");
-    printState(state);
+    if (!state->quiet) {
+      printf("===== STEP =====\n");
+      printState(state);
+    }
     _err = machine(state);
   }
   if (_err) printf("'%s' on operand `%"PRIu64"`\n", getErrorMsg(_err), state->op);
-  printState(state);
+  if (!state->quiet)
+    printState(state);
 
   machineFreeState(state);
 

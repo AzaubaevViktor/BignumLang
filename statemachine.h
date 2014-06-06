@@ -13,6 +13,11 @@ typedef struct _State {
   Program *prg;
   uint64_t cs;
   uint64_t op;
+  Bignum *nul;
+  Bignum *bnI;
+  Bignum *bn1;
+  Bignum *res;
+  bool quiet;
 } State;
 
 Reterr machineInitState(State **state);

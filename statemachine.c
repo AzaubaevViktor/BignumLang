@@ -8,12 +8,23 @@ Reterr machineInitState(State **state) {
   (*state)->prg = NULL;
   (*state)->cs = 0;
   (*state)->op = 0;
+  (*state)->quiet = 0;
+  ERR_CH(bnInit(&((*state)->nul),0));
+  ERR_CH(bnInit(&((*state)->bnI),0));
+  ERR_CH(bnInit(&((*state)->bn1),0));
+  ERR_CH(bnInit(&((*state)->res),0));
+
+  ERR_CH(bnSetInt((*state)->bn1, 1));
   return 0;
 }
 
 void machineFreeState(State *state) {
   rgFree(state->regs);
   programFree(state->prg);
+  bnFree(state->nul);
+  bnFree(state->bnI);
+  bnFree(state->bn1);
+  bnFree(state->res);
   free(state);
 }
 
@@ -36,8 +47,6 @@ Reterr machine(State *state) {
   Token *tk;
   Bignum *one = NULL, *two = NULL, *result = NULL, *regResult = NULL;
   Num _res;
-  Bignum *_nul = NULL, *bnI = NULL, *bn1 = NULL, *res;
-  ERR_CH(bnInit(&_nul, 0));
 
   isJump = 0;
 
@@ -55,7 +64,7 @@ Reterr machine(State *state) {
 
   _err = getNumByReg(state->regs, tk->res, &result);
   if (RUNTIME_REGISTER_NOT_SET == _err) {
-    rgSet(state->regs, tk->res->n, _nul);
+    rgSet(state->regs, tk->res->n, state->nul);
     ERR_CH(getNumByReg(state->regs, tk->res, &result));
   }
 
@@ -64,7 +73,7 @@ Reterr machine(State *state) {
     _res.n = result;
     _err = getNumByReg(state->regs, &_res, &regResult);
     if (RUNTIME_REGISTER_NOT_SET == _err) {
-      rgSet(state->regs, result, _nul);
+      rgSet(state->regs, result, state->nul);
       ERR_CH(getNumByReg(state->regs, &_res, &regResult));
     }
   }
@@ -119,40 +128,51 @@ Reterr machine(State *state) {
   } else if (tk->tp == copy) { // copy
     ERR_CH(bnCopy(one, regResult));
   } else if (tk->tp == go) { // go
-    if (0 != bnCmp(one, _nul)) {
+    if (!bnCmp(one, state->nul)) {
       state->cs = bnBignumToUInt64(result);
       isJump = 1;
     }
   } else if (tk->tp == interrupt) { // interrupt
-    ERR_CH(bnInit(&bnI, 0));
-    ERR_CH(bnInit(&bn1, 0));
-    ERR_CH(bnInit(&res, 0));
-    ERR_CH(bnSetInt(bn1, 1));
+    ERR_CH(bnSetInt(state->bnI, 0));
 
-
-    if (!bnCmp(one, bnI)) { // 0
-      printf("inp>>`");
+    if (!bnCmp(one, state->bnI)) { // 0
+      (state->quiet) || printf("inp>>`");
       ERR_CH(bnSetInt(regResult, getchar()));
-      printf("`");
+      (state->quiet) || printf("`");
     }
 
-    ERR_CH(bnSum(bnI,bn1,res));
-    ERR_CH(bnCopy(res, bnI));
+    ERR_CH(bnSum(state->bnI,state->bn1,state->res));
+    ERR_CH(bnCopy(state->res, state->bnI));
 
-    if (!bnCmp(one, bnI)) { // 1
-      printf("out:`");
+    if (!bnCmp(one, state->bnI)) { // 1
+      (state->quiet) || printf("out:`");
       putchar((int) (bnBignumToUInt64(regResult) % 256));
-      printf("`\n");
+      (state->quiet) || printf("`\n");
     }
 
-    bnFree(bnI);
-    bnFree(bn1);
-    bnFree(res);
+    ERR_CH(bnSum(state->bnI,state->bn1,state->res));
+    ERR_CH(bnCopy(state->res, state->bnI));
+
+    if (!bnCmp(one, state->bnI)) { // 2
+
+    }
+
+    ERR_CH(bnSum(state->bnI,state->bn1,state->res));
+    ERR_CH(bnCopy(state->res, state->bnI));
+
+    if (!bnCmp(one, state->bnI)) { // 3
+
+    }
+
+    ERR_CH(bnSum(state->bnI,state->bn1,state->res));
+    ERR_CH(bnCopy(state->res, state->bnI));
+
+    if (!bnCmp(one, state->bnI)) { // 4
+
+    }
   }
 
   if (!isJump) (state->cs)++;
-
-  bnFree(_nul);
 
   return 0;
 }
