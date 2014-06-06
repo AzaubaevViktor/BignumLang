@@ -127,15 +127,23 @@ Reterr machine(State *state) {
     ERR_CH(bnInit(&bnI, 0));
     ERR_CH(bnInit(&bn1, 0));
     ERR_CH(bnInit(&res, 0));
-    ERR_CH(bnSetInt(bnI, 1));
+    ERR_CH(bnSetInt(bn1, 1));
 
 
-    if (bnCmp(one, bnI)) {
+    if (!bnCmp(one, bnI)) { // 0
+      printf("inp>>`");
       ERR_CH(bnSetInt(regResult, getchar()));
+      printf("`");
     }
 
     ERR_CH(bnSum(bnI,bn1,res));
     ERR_CH(bnCopy(res, bnI));
+
+    if (!bnCmp(one, bnI)) { // 1
+      printf("out:`");
+      putchar((int) (bnBignumToUInt64(regResult) % 256));
+      printf("`\n");
+    }
 
     bnFree(bnI);
     bnFree(bn1);
